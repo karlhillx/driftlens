@@ -11,6 +11,7 @@ from .models import Severity
 class DriftPolicy(BaseModel):
     ignore_keys: list[str] = Field(default_factory=list)
     severity_overrides: dict[str, Severity] = Field(default_factory=dict)
+    owner_overrides: dict[str, str] = Field(default_factory=dict)
 
 
 DEFAULT_POLICY_FILENAMES = (".driftlens.yaml", ".driftlens.yml")
@@ -31,6 +32,13 @@ def override_severity(key: str, policy: DriftPolicy) -> Severity | None:
         if _matches(pattern, key):
             return sev
     return None
+
+
+def owner_for_key(key: str, policy: DriftPolicy) -> str:
+    for pattern, owner in policy.owner_overrides.items():
+        if _matches(pattern, key):
+            return owner
+    return "unowned"
 
 
 def load_policy(path: Path | None, baseline: Path, target: Path) -> DriftPolicy:

@@ -13,6 +13,8 @@ It compares environment snapshots (dev/stage/prod), classifies drift by risk, re
 - **Policy-as-code** via `.driftlens.yaml`
   - ignore keys/patterns
   - severity overrides
+  - owner overrides (routing)
+- **Owner routing + source pointers** on every finding (`owner`, `source_ref`)
 - **Safe-by-default output**: values redacted unless `--show-values`
 - **CI gating**: `--fail-on <severity>` with non-zero exit code
 - **Reporting**: table, markdown, JSON, and **JUnit XML** (`--junit-out`)
@@ -60,6 +62,10 @@ ignore_keys:
 severity_overrides:
   "service.yaml:api.base_url": high
   ".env:JWT_SECRET": critical
+owner_overrides:
+  "service.yaml:api.*": platform-team
+  "service.yaml:queue.*": platform-team
+  ".env:JWT_SECRET": security-team
 ```
 
 Pattern matching supports exact match and prefix wildcard (`*`), e.g.:
@@ -74,6 +80,8 @@ Pattern matching supports exact match and prefix wildcard (`*`), e.g.:
 - `--format markdown`
 - `--format json`
 - `--junit-out path.xml` (for CI test report ingestion)
+
+Findings include `owner` and `source_ref` so drift can be routed directly to the right team and file path.
 
 By default, values are redacted:
 

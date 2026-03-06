@@ -1,8 +1,15 @@
 from __future__ import annotations
 
 from .models import DriftItem, ScanResult
-from .policy import DriftPolicy, override_severity, should_ignore
+from .policy import DriftPolicy, owner_for_key, override_severity, should_ignore
 from .scoring import classify_key, recommendation
+
+
+def _split_source(key: str) -> tuple[str, str]:
+    if ":" in key:
+        source_file, source_key = key.split(":", 1)
+        return source_file, source_key
+    return "unknown", key
 
 
 def compare_snapshots(
@@ -34,9 +41,15 @@ def compare_snapshots(
             change_type = "changed"
 
         sev = override_severity(key, active_policy) or classify_key(key)
+        source_file, source_key = _split_source(key)
+        owner = owner_for_key(key, active_policy)
         items.append(
             DriftItem(
                 key=key,
+                source_file=source_file,
+                source_key=source_key,
+                source_ref=f"{source_file}:{source_key}",
+                owner=owner,
                 baseline_value=b,
                 target_value=t,
                 change_type=change_type,

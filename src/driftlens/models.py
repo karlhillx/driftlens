@@ -14,6 +14,10 @@ class Severity(str, Enum):
 
 class DriftItem(BaseModel):
     key: str
+    source_file: str
+    source_key: str
+    source_ref: str
+    owner: str
     baseline_value: str | None
     target_value: str | None
     change_type: str  # added|removed|changed
