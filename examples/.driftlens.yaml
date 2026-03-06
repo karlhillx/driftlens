@@ -1,0 +1,5 @@
+ignore_keys:
+  - "service.yaml:build.timestamp"
+severity_overrides:
+  "service.yaml:api.base_url": high
+  ".env:REQUEST_TIMEOUT": medium

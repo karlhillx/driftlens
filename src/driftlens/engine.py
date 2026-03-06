@@ -1,14 +1,26 @@
 from __future__ import annotations
 
 from .models import DriftItem, ScanResult
+from .policy import DriftPolicy, override_severity, should_ignore
 from .scoring import classify_key, recommendation
 
 
-def compare_snapshots(baseline_name: str, target_name: str, baseline: dict[str, str], target: dict[str, str]) -> ScanResult:
+def compare_snapshots(
+    baseline_name: str,
+    target_name: str,
+    baseline: dict[str, str],
+    target: dict[str, str],
+    policy: DriftPolicy | None = None,
+) -> ScanResult:
+    active_policy = policy or DriftPolicy()
+
     keys = sorted(set(baseline) | set(target))
     items: list[DriftItem] = []
 
     for key in keys:
+        if should_ignore(key, active_policy):
+            continue
+
         b = baseline.get(key)
         t = target.get(key)
         if b == t:
@@ -21,7 +33,7 @@ def compare_snapshots(baseline_name: str, target_name: str, baseline: dict[str, 
         else:
             change_type = "changed"
 
-        sev = classify_key(key)
+        sev = override_severity(key, active_policy) or classify_key(key)
         items.append(
             DriftItem(
                 key=key,
