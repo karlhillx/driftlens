@@ -67,15 +67,19 @@ def scan(
             f"- Severity: critical={result.by_severity['critical']}, high={result.by_severity['high']}, "
             f"medium={result.by_severity['medium']}, low={result.by_severity['low']}\n"
         )
-        typer.echo("| Severity | Change | Key | Baseline | Target |")
-        typer.echo("|---|---|---|---|---|")
+        typer.echo("| Severity | Owner | Source | Change | Key | Baseline | Target |")
+        typer.echo("|---|---|---|---|---|---|---|")
         for item in result.items:
             b = redact_value(item.baseline_value, show_values=show_values).replace("|", "\\|")
             t = redact_value(item.target_value, show_values=show_values).replace("|", "\\|")
-            typer.echo(f"| {item.severity.value} | {item.change_type} | `{item.key}` | `{b}` | `{t}` |")
+            typer.echo(
+                f"| {item.severity.value} | {item.owner} | `{item.source_ref}` | {item.change_type} | `{item.key}` | `{b}` | `{t}` |"
+            )
     else:
         table = Table(title="DriftLens Report")
         table.add_column("Severity", style="bold")
+        table.add_column("Owner")
+        table.add_column("Source")
         table.add_column("Change")
         table.add_column("Key")
         table.add_column("Baseline")
@@ -84,6 +88,8 @@ def scan(
         for item in result.items:
             table.add_row(
                 item.severity.value.upper(),
+                item.owner,
+                item.source_ref,
                 item.change_type,
                 item.key,
                 redact_value(item.baseline_value, show_values=show_values),
