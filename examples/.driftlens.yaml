@@ -1,0 +1,10 @@
+ignore_keys:
+  - "service.yaml:build.timestamp"
+severity_overrides:
+  "service.yaml:api.base_url": high
+  ".env:REQUEST_TIMEOUT": medium
+owner_overrides:
+  "service.yaml:api.*": platform-team
+  "service.yaml:queue.*": platform-team
+  ".env:JWT_SECRET": security-team
+  ".env:DB_*": data-team
