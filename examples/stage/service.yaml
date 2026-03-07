@@ -1,0 +1,5 @@
+api:
+  base_url: https://api-stage.example.com
+  retries: 2
+queue:
+  broker_url: amqp://mq-stage.internal

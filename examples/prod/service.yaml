@@ -1,0 +1,5 @@
+api:
+  base_url: https://api.example.com
+  retries: 3
+queue:
+  broker_url: amqp://mq-prod.internal
