@@ -20,6 +20,7 @@ def scan(
     baseline: Annotated[Path, typer.Option("--baseline", exists=True, file_okay=False, dir_okay=True, readable=True)],
     target: Annotated[Path, typer.Option("--target", exists=True, file_okay=False, dir_okay=True, readable=True)],
     format: Annotated[str, typer.Option("--format", help="table|markdown|json")] = "table",
+    reveal: Annotated[bool, typer.Option("--reveal", help="Reveal critical secret values in output")] = False,
 ) -> None:
     baseline_data = load_snapshot(baseline)
     target_data = load_snapshot(target)
@@ -29,6 +30,7 @@ def scan(
         target_name=str(target),
         baseline=baseline_data,
         target=target_data,
+        reveal=reveal,
     )
 
     fmt = format.lower().strip()

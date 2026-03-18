@@ -4,7 +4,13 @@ from .models import DriftItem, ScanResult
 from .scoring import classify_key, recommendation
 
 
-def compare_snapshots(baseline_name: str, target_name: str, baseline: dict[str, str], target: dict[str, str]) -> ScanResult:
+def compare_snapshots(
+    baseline_name: str, 
+    target_name: str, 
+    baseline: dict[str, str], 
+    target: dict[str, str],
+    reveal: bool = False
+) -> ScanResult:
     keys = sorted(set(baseline) | set(target))
     items: list[DriftItem] = []
 
@@ -22,11 +28,19 @@ def compare_snapshots(baseline_name: str, target_name: str, baseline: dict[str, 
             change_type = "changed"
 
         sev = classify_key(key)
+        
+        # Redact values for critical keys unless reveal is True
+        b_val = b
+        t_val = t
+        if sev == Severity.CRITICAL and not reveal:
+            b_val = "********" if b else None
+            t_val = "********" if t else None
+
         items.append(
             DriftItem(
                 key=key,
-                baseline_value=b,
-                target_value=t,
+                baseline_value=b_val,
+                target_value=t_val,
                 change_type=change_type,
                 severity=sev,
                 recommendation=recommendation(sev, key),
